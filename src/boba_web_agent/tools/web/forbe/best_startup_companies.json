@@ -1,0 +1,61 @@
+{
+  "elements": {
+    "next_page": "<button class=\"DUQ8wnnp JULvqjXa TVxEFOXb f79QY-7J _7zkbhAtG\" aria-label=\"Next\"><svg class=\"arrow-right_svg__fs-icon arrow-right_svg__fs-icon--arrow-right\" xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 24 24\"><path d=\"M12.6 6.4l4.6 4.6H3v2h14.2l-4.6 4.6L14 19l7-7-7-7z\"></path></svg></button>",
+    "rank_list": "<section class=\"csf-row et-rows row_658606d3edffe\" id=\"row-2\"></section>",
+    "search_by_name": "<input class=\"filter-input\" id=\"filter\" role=\"form\" aria-label=\"SEARCH BY NAME\" type=\"text\" placeholder=\"SEARCH BY NAME\"></input>",
+    "search_by_industry": "<select class=\"dropdown-input\" id=\"dropdown\" role=\"form\" aria-label=\"SEARCH BY INDUSTRY\"></select>"
+  },
+  "tasks": {
+    "get_rank_list": {
+      "actions": [
+        {
+          "name": "get_text",
+          "target": [
+            "rank_list"
+          ]
+        },
+        {
+          "name": "click",
+          "target": [
+            "next_page"
+          ],
+          "screenshot": false
+        }
+      ],
+      "repeat_when": [
+        {
+          "enabled": ["next_page"]
+        }
+      ]
+    },
+    "get_filtered_rank_list": {
+      "inputs": [
+        "name",
+        "sector_name"
+      ],
+      "actions": [
+        {
+          "name": "input_text",
+          "target": [
+            "search_by_name"
+          ],
+          "args": {
+            "value": "$name"
+          }
+        },
+        {
+          "name": "select",
+          "target": [
+            "search_by_industry"
+          ],
+          "args": {
+            "value": "$sector_name"
+          }
+        },
+        {
+          "name": "get_rank_list"
+        }
+      ]
+    }
+  }
+}

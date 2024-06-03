@@ -1,0 +1,30 @@
+{
+  "elements": {
+    "next_page": "<a aria-label=\"Next Page\" class=\"m-icon-angle-right m-active\" href=\"https://aws.amazon.com/containers/customers/?customer-references-cards.sort-by=item.additionalFields.sortDate&amp;customer-references-cards.sort-order=desc&amp;awsf.customer-references-location=*all&amp;awsf.customer-references-industry=*all&amp;awsf.customer-references-segment=customer-segment%23startup&amp;awsf.customer-references-product=*all&amp;awsm.page-customer-references-cards=2\"></a>",
+    "story_list": "<section class=\"m-card-educational-grid lb-row lb-snap lb-row-max-large\"></section>"
+  },
+  "tasks": {
+    "get_stories": {
+      "actions": [
+        {
+          "name": "get_text",
+          "target": [
+            "story_list"
+          ]
+        },
+        {
+          "name": "click",
+          "target": [
+            "next_page"
+          ],
+          "screenshot": false
+        }
+      ],
+      "repeat_when": [
+        {
+          "enabled": ["next_page"]
+        }
+      ]
+    }
+  }
+}

@@ -13,6 +13,8 @@ from webdriver_manager.chrome import ChromeDriverManager
 from webdriver_manager.firefox import GeckoDriverManager
 from webdriver_manager.microsoft import EdgeChromiumDriverManager
 
+from boba_web_agent.automation.web_automatoin.selenium.types import ElementConditions, ElementDict
+
 DEFAULT_USER_AGENT_STRING = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36"
 
 
@@ -110,7 +112,7 @@ class WebDriver:
     A class to manage the creation of WebDriver instances for different browsers with configurable options.
     """
 
-    def __init__(self, driver_type: WebAutomationDrivers = WebAutomationDrivers.Firefox,
+    def __init__(self, driver_type: WebAutomationDrivers = WebAutomationDrivers.UndetectedChrome,
                  headless: bool = True, user_agent: str = None,
                  timeout: int = 120, options: List[str] = None):
         """
@@ -134,7 +136,7 @@ class WebDriver:
         )
 
     def open_url(self, url: str = None, wait_after_opening_url: float = 0):
-        from boba_web_agent.automation.web_automatoin.selenium_web_driver_utils import open_url
+        from boba_web_agent.automation.web_automatoin.selenium.actions import open_url
         return open_url(
             driver=self.driver,
             url=url,
@@ -142,7 +144,7 @@ class WebDriver:
         )
 
     def get_body_html_from_url(self, url: str = None, initial_wait: float = 0, timeout_for_page_loading: int = 20, return_dynamic_contents: bool = True):
-        from boba_web_agent.automation.web_automatoin.selenium_web_driver_utils import get_body_html_from_url
+        from boba_web_agent.automation.web_automatoin.selenium.common import get_body_html_from_url
         return get_body_html_from_url(
             driver=self.driver,
             url=url,
@@ -152,18 +154,18 @@ class WebDriver:
         )
 
     def get_body_html(self, return_dynamic_contents: bool = True) -> str:
-        from boba_web_agent.automation.web_automatoin.selenium_web_driver_utils import get_body_html
+        from boba_web_agent.automation.web_automatoin.selenium.common import get_body_html
         return get_body_html(
             driver=self.driver,
             return_dynamic_contents=return_dynamic_contents
         )
 
     def get_element_html(self, element) -> str:
-        from boba_web_agent.automation.web_automatoin.selenium_web_driver_utils import get_element_html
+        from boba_web_agent.automation.web_automatoin.selenium.common import get_element_html
         return get_element_html(element=element)
 
     def wait_for_page_loading(self, timeout: int = 30, extra_wait_min=1, extra_wait_max=5):
-        from boba_web_agent.automation.web_automatoin.selenium_web_driver_utils import wait_for_page_loading
+        from boba_web_agent.automation.web_automatoin.selenium.common import wait_for_page_loading
         wait_for_page_loading(self.driver, timeout=timeout)
         import random
         from time import sleep
@@ -176,7 +178,7 @@ class WebDriver:
             text: str = None,
             immediate_text: str = None
     ):
-        from boba_web_agent.automation.web_automatoin.selenium_web_driver_utils import find_element_by_xpath
+        from boba_web_agent.automation.web_automatoin.selenium.element_selection import find_element_by_xpath
         return find_element_by_xpath(
             driver=self.driver,
             tag_name=tag_name,
@@ -192,7 +194,7 @@ class WebDriver:
             text: str = None,
             immediate_text: str = None
     ):
-        from boba_web_agent.automation.web_automatoin.selenium_web_driver_utils import find_elements_by_xpath
+        from boba_web_agent.automation.web_automatoin.selenium.element_selection import find_elements_by_xpath
         return find_elements_by_xpath(
             driver=self.driver,
             tag_name=tag_name,
@@ -202,7 +204,7 @@ class WebDriver:
         )
 
     def find_element_by_html(self, target_element_html, identifying_attributes=('id', 'aria-label', 'class'), always_return_single_element: bool = False):
-        from boba_web_agent.automation.web_automatoin.selenium_web_driver_utils import find_element_by_html
+        from boba_web_agent.automation.web_automatoin.selenium.element_selection import find_element_by_html
         return find_element_by_html(
             driver=self.driver,
             target_element_html=target_element_html,
@@ -211,14 +213,14 @@ class WebDriver:
         )
 
     def capture_full_page_screenshot(self, output_path):
-        from boba_web_agent.automation.web_automatoin.selenium_web_driver_utils import capture_full_page_screenshot
+        from boba_web_agent.automation.web_automatoin.selenium.actions import capture_full_page_screenshot
         capture_full_page_screenshot(
             driver=self.driver,
             output_path=output_path
         )
 
     def execute_single_action(self, element: WebElement, action_name: str, action_args: Mapping = None):
-        from boba_web_agent.automation.web_automatoin.selenium_web_driver_utils import execute_single_action
+        from boba_web_agent.automation.web_automatoin.selenium.execution import execute_single_action
         execute_single_action(
             driver=self.driver,
             element=element,
@@ -226,10 +228,24 @@ class WebDriver:
             action_args=action_args
         )
 
-    def execute_actions(self, actions: Mapping, output_path_action_records: str = None):
-        from boba_web_agent.automation.web_automatoin.selenium_web_driver_utils import execute_actions
+    def execute_actions(
+            self,
+            actions: Mapping,
+            init_cond: Union[bool, ElementConditions] = None,
+            repeat: int = 0,
+            repeat_when: ElementConditions = None,
+            elements_dict: ElementDict = None,
+            output_path_action_records: str = None,
+            **kwargs
+    ):
+        from boba_web_agent.automation.web_automatoin.selenium.execution import execute_actions
         execute_actions(
             driver=self.driver,
             actions=actions,
-            output_path_action_records=output_path_action_records
+            init_cond=init_cond,
+            repeat=repeat,
+            repeat_when=repeat_when,
+            elements_dict=elements_dict,
+            output_path_action_records=output_path_action_records,
+            **kwargs
         )

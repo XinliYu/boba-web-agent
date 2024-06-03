@@ -1,8 +1,45 @@
 from typing import Union, List, Iterable, Optional, Mapping, Sequence, Any, Tuple
-
+import re
 from bs4 import BeautifulSoup, NavigableString
 
 from boba_python_utils.string_utils import string_check
+
+HTML_STYLE_STRING_REGEX = re.compile(r'^<([a-zA-Z][a-zA-Z0-9]*)[^>]*>.*?</\1>$', re.DOTALL)
+
+
+def is_html_style_string(s: str) -> bool:
+    """Check if a string is enclosed by any HTML tag.
+
+    This function uses a regular expression to determine if a given string
+    is enclosed by a matching pair of HTML tags.
+
+    Args:
+        s: The input string to check.
+
+    Returns:
+        True if the string is enclosed by a matching HTML tag, False otherwise.
+
+    Examples:
+        >>> is_html_style_string("<p>This is a paragraph.</p>")
+        True
+        >>> is_html_style_string("<div><p>This is a paragraph.</p></div>")
+        True
+        >>> is_html_style_string("<span>Some text</span>")
+        True
+        >>> is_html_style_string("<a href='example.com'>Link</a>")
+        True
+        >>> is_html_style_string("<p>Nested <span>text</span></p>")
+        True
+        >>> is_html_style_string("<div>\\n<p>Text on\\nmultiple lines</p>\\n</div>")
+        True
+        >>> is_html_style_string("<div>\\n<p>Text on\\nmultiple lines</p>\\n</span>")
+        False
+        >>> is_html_style_string("Just a plain text")
+        False
+    """
+    match = HTML_STYLE_STRING_REGEX.fullmatch(s)
+    return match is not None
+
 
 def get_tag_text_and_attributes_from_element_html(
         element_html: str
@@ -267,7 +304,7 @@ def get_xpath(
         ... </div>
         ... '''
         >>> tree = fromstring(html_doc)
-        >>> xpath_submit_button = get_xpath('button', {'type': 'submit', 'class': ['btn', 'primary', 'large']}, immediate_text='Submit')
+        >>> xpath_submit_button = get_xpath('button', attributes={'type': 'submit', 'class': ['btn', 'primary', 'large']}, immediate_text='Submit')
         >>> submit_button = tree.xpath(xpath_submit_button)
         >>> submit_button[0].text.strip() if submit_button else 'No Button Found'
         'Submit'

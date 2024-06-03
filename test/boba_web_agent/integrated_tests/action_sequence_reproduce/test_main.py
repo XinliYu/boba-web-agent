@@ -1,7 +1,7 @@
 from os import path
 
 from boba_web_agent.integrated_tests.action_sequence_reproduce.test_data_example import DATA_EXAMPLE
-from boba_web_agent.automation.web_automatoin.common import WebDriver, WebAutomationDrivers
+from boba_web_agent.automation.web_automatoin.web_driver import WebDriver, WebAutomationDrivers
 
 if __name__ == '__main__':
     output_path_recordings_root = 'test_case_recordings'
