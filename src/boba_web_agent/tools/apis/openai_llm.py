@@ -20,13 +20,15 @@ class OpenAIModels(str, Enum):
     GPT4 = "gpt-4"
     GPT4_TURBO = 'gpt-4-turbo'
     GPT4_32K = "gpt-4-32k-0613"
+    GPT4O = "gpt-4o"
 
 
 DEFAULT_MAX_TOKENS = {
     f'{OpenAIModels.GPT4}': 2048,
     f'{OpenAIModels.GPT4_32K}': 3096,
     f'{OpenAIModels.GPT3}': 1024,
-    f'{OpenAIModels.GPT3_16K}': 3096
+    f'{OpenAIModels.GPT3_16K}': 3096,
+    f'{OpenAIModels.GPT4O}': 4096
 }
 
 

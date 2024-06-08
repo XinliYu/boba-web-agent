@@ -1,7 +1,7 @@
 from typing import List, Optional, Tuple
 
 from bs4 import BeautifulSoup
-from selenium.webdriver.chrome.webdriver import WebDriver
+from selenium.webdriver.remote.webdriver import WebDriver
 from selenium.webdriver.remote.webelement import WebElement
 from selenium.webdriver.support.wait import WebDriverWait
 
@@ -116,6 +116,22 @@ def get_text(
     return soup.get_text()
 
 
+# endregion
+
+# region get sizes
+
+def get_device_pixel_ratio(driver: WebDriver) -> int:
+    return driver.execute_script("return window.devicePixelRatio")
+
+
+def get_scroll_width(driver: WebDriver) -> int:
+    return driver.execute_script("return document.body.parentNode.scrollWidth")
+
+
+def get_scroll_height(driver: WebDriver) -> int:
+    return driver.execute_script("return document.body.parentNode.scrollHeight")
+
+
 def get_element_size(element: WebElement) -> Tuple[int, int]:
     """
     Gets the width and height of the given WebElement.
@@ -128,6 +144,5 @@ def get_element_size(element: WebElement) -> Tuple[int, int]:
     """
     size = element.size
     return size['width'], size['height']
-
 
 # endregion

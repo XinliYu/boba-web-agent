@@ -97,12 +97,20 @@ def get_driver(
             _options.add_argument("--headless")
         if user_agent:
             # The Webdriver is best tested for this default user-agent string.
-            _options.add_argument(DEFAULT_USER_AGENT_STRING if user_agent == 'default' else user_agent)
+            _options.add_argument("user-agent=" + (DEFAULT_USER_AGENT_STRING if user_agent == 'default' else user_agent))
         if options:
             for option in options:
                 _options.add_argument(option)
 
     driver = driver_class(service=webdriver_service, options=_options)
+
+    if driver_class is webdriver.Chrome or driver_class is uc.Chrome:
+        driver.execute_script("Object.defineProperty(navigator, 'webdriver', {get: () => undefined})")
+        driver.execute_script("window.navigator.webdriver = undefined")
+        driver.execute_script("window.navigator.languages = ['en-US', 'en']")
+        driver.execute_script("window.navigator.plugins = [1, 2, 3, 4, 5]")
+        driver.execute_script("window.navigator.platform = 'Win32'")
+
     driver.set_page_load_timeout(timeout)
     return driver
 
@@ -112,9 +120,12 @@ class WebDriver:
     A class to manage the creation of WebDriver instances for different browsers with configurable options.
     """
 
-    def __init__(self, driver_type: WebAutomationDrivers = WebAutomationDrivers.UndetectedChrome,
-                 headless: bool = True, user_agent: str = None,
-                 timeout: int = 120, options: List[str] = None):
+    def __init__(self,
+                 driver_type: WebAutomationDrivers = WebAutomationDrivers.UndetectedChrome,
+                 headless: bool = True,
+                 user_agent: str = None,
+                 timeout: int = 120,
+                 options: List[str] = None):
         """
         Initializes a WebDriver instance with the specified configuration upon creation of the class instance.
 
@@ -212,11 +223,22 @@ class WebDriver:
             always_return_single_element=always_return_single_element
         )
 
-    def capture_full_page_screenshot(self, output_path):
+    def capture_full_page_screenshot(
+            self,
+            output_path: str,
+            center_element: WebElement = None,
+            restore_window_size: bool = False,
+            reset_zoom: bool = True,
+            use_cdp_cmd_for_chrome: bool = False
+    ):
         from boba_web_agent.automation.web_automatoin.selenium.actions import capture_full_page_screenshot
         capture_full_page_screenshot(
             driver=self.driver,
-            output_path=output_path
+            output_path=output_path,
+            center_element=center_element,
+            restore_window_size=restore_window_size,
+            reset_zoom=reset_zoom,
+            use_cdp_cmd_for_chrome=use_cdp_cmd_for_chrome
         )
 
     def execute_single_action(self, element: WebElement, action_name: str, action_args: Mapping = None):

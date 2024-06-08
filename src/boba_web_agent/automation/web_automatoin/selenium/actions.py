@@ -1,10 +1,11 @@
 import time
 from typing import Union, Tuple
-
+import undetected_chromedriver as uc
+from selenium import webdriver
 from selenium.common import TimeoutException
-from selenium.webdriver.chrome.webdriver import WebDriver
+from selenium.webdriver.remote.webdriver import WebDriver
 from selenium.webdriver.remote.webelement import WebElement
-
+import base64
 from boba_python_utils.general_utils.console_util import hprint_message
 from boba_python_utils.time_utils.common import random_sleep
 from boba_web_agent.automation.web_automatoin.selenium.common import wait_for_page_loading
@@ -108,36 +109,59 @@ def zoom_out_to_fit_element(driver: WebDriver, element: WebElement, buffer: floa
 
 
 def capture_full_page_screenshot(
-        driver,
+        driver: WebDriver,
         output_path,
         center_element: WebElement = None,
         restore_window_size: bool = False,
-        reset_zoom: bool = True
+        reset_zoom: bool = True,
+        use_cdp_cmd_for_chrome: bool = False,
+        scale_based_on_content_size: bool = True,
+        scale: float = 1.0
 ):
-    original_size = driver.get_window_size()
-    total_width = driver.execute_script('return document.body.parentNode.scrollWidth')
-    total_height = driver.execute_script('return document.body.parentNode.scrollHeight')
-    driver.set_window_size(total_width, total_height)
-    time.sleep(3)
-    page_zoomed = False
-    if center_element is not None:
-        zoom_out_to_fit_element(driver, center_element)
-        center_element_in_view(driver, center_element)
-        page_zoomed = True
-    wait_for_page_loading(driver)
+    if scale_based_on_content_size:
+        scale *= 1 / driver.execute_script("return window.devicePixelRatio")
 
-    screenshot = driver.get_screenshot_as_png()
-    with open(output_path, "wb") as file:
-        file.write(screenshot)
+    if use_cdp_cmd_for_chrome and isinstance(driver, (webdriver.Chrome, uc.Chrome)):
+        total_width = driver.execute_script("return document.body.parentNode.scrollWidth")
+        total_height = driver.execute_script("return document.body.parentNode.scrollHeight")
+        screenshot = base64.b64decode(driver.execute_cdp_cmd("Page.captureScreenshot", {
+            "clip": {
+                "x": 0,
+                "y": 0,
+                "width": total_width,
+                "height": total_height,
+                "scale": scale
+            },
+            "captureBeyondViewport": True
+        })['data'])
 
-    if page_zoomed and reset_zoom:
-        set_zoom(driver, 100)
-        time.sleep(2)
+        with open(output_path, "wb") as file:
+            file.write(screenshot)
+    else:
+        original_size = driver.get_window_size()
+        total_width = driver.execute_script('return document.body.parentNode.scrollWidth')
+        total_height = driver.execute_script('return document.body.parentNode.scrollHeight')
+        driver.set_window_size(total_width, total_height)
+        time.sleep(3)
+        page_zoomed = False
+        if center_element is not None:
+            zoom_out_to_fit_element(driver, center_element)
+            center_element_in_view(driver, center_element)
+            page_zoomed = True
         wait_for_page_loading(driver)
-    if restore_window_size:
-        driver.set_window_size(original_size['width'], original_size['height'])
-        time.sleep(2)
-        wait_for_page_loading(driver)
+
+        screenshot = driver.get_screenshot_as_png()
+        with open(output_path, "wb") as file:
+            file.write(screenshot)
+
+        if page_zoomed and reset_zoom:
+            set_zoom(driver, 100)
+            time.sleep(2)
+            wait_for_page_loading(driver)
+        if restore_window_size:
+            driver.set_window_size(original_size['width'], original_size['height'])
+            time.sleep(2)
+            wait_for_page_loading(driver)
 
 
 def open_url(
