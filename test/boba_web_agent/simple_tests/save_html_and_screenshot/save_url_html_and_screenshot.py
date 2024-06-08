@@ -9,11 +9,11 @@ url_lsit = [
 ]
 
 output_path = 'test_case_recordings'
-driver = WebDriver(headless=False, driver_type=WebAutomationDrivers.UndetectedChrome)
+driver = WebDriver(headless=False, user_agent='default', driver_type=WebAutomationDrivers.UndetectedChrome)
 
 for url_index, url in enumerate(url_lsit):
     output_path_test_case = path.join(output_path, str(url_index))
     driver.open_url(url)
     driver.wait_for_page_loading()
     write_all_text(driver.get_body_html(), path.join(output_path_test_case, 'source.html'))
-    driver.capture_full_page_screenshot(path.join(output_path_test_case, 'screenshot.png'))
+    driver.capture_full_page_screenshot(path.join(output_path_test_case, 'screenshot.png'), use_cdp_cmd_for_chrome=True)
